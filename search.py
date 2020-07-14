@@ -2,37 +2,24 @@ import re
 from pathlib import Path
 import os
 
-def save_paths(data):
-    """write the indexing to a text file"""
-    with open('file.txt', 'w', encoding='utf-8') as f:
-        for x in data:
-            f.write(x + '\n')
- 
-def index_dir(path):
-    """recursive function that indexes a directory"""
-    paths = []
+def find_matches(path, matches, regex):
+    """recursive function that crawls through directories and appends filenames to matches array that match the regular expression"""
     for x in os.listdir(path):
         p = os.path.join(path, x)
         if os.path.isdir(p):
-            # append return to paths
-            # add try block around recursive call
             try:
-                a = index_dir(p)
+                a = find_matches(p, matches, regex)
                 paths.extend(a)
             except:
-                print(p, ' is not a dir')
+                pass
         if os.path.isfile(p):
-            paths.append(p)
-    return paths
+            if re.search(regex, x):
+                print(path + x)
+                matches.append(path + x)
 
-def get_root():
-    """return path of root of file system"""
-    return Path.home().parts[0]
-
-def save_to_file():
-    """save all of the filepaths"""
-    root_dir = get_root()
+def system_search(matches, regex):
+    """populate matches array with regex filename matches"""
+    root_dir = Path.home().parts[0]
     p = Path('.')
     p = p.resolve()
-    system_filepaths = index_dir(root_dir)
-    save_paths(system_filepaths)
+    find_matches(root_dir, matches, regex)

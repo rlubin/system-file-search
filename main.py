@@ -1,4 +1,5 @@
 from App import App
+import search
 
 def main():
     App()
