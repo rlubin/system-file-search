@@ -1,37 +1,31 @@
 import tkinter as tk
 import search
 
-class App(tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.master = master
-        self.pack()
-        self.create_widgets()
-
-    def create_widgets(self):
-        self.button = tk.Button(self)
-        self.button['text'] = 'Search'
-        self.button['command'] = self.search_button
-        self.button.pack(side='bottom')
-
-        self.label = tk.Label(self)
-        self.label['text'] = 'Filename'
-        self.label.pack(side='left')
-
-        self.entry = tk.Entry(self, bd = 5)
-        self.entry.pack(side='right')
-
-    def search_button(self):
-        matches = []
-        regex_exp = self.entry.get()
-        match_window = tk.Toplevel(self)
-        match_window.title(regex_exp)
-        match_window.geometry("500x1000")
-        tk.Label(match_window, text =matches).pack()
-        search.system_search(matches, regex_exp)
+def search_button():
+    regex = entry.get()
+    match_window = tk.Toplevel(root)
+    match_window.title(regex)
+    match_window.geometry("500x500")
+    lb = tk.Listbox(match_window)
+    lb.pack()
+    matches = []
+    search.system_search(matches, regex)
+    # match_num = f'Matches: {len(matches)}'
+    # label = tk.Label(match_window, textvariable=match_num)
+    # label.pack()
+    for item in matches:
+        lb.insert(tk.END, item)
 
 root = tk.Tk()
-root.geometry("350x50")
 root.title("System File Search")
-app = App(master=root)
-app.mainloop()
+root.grid()
+
+label = tk.Label(root, text='Filename')
+entry = tk.Entry(root)
+button = tk.Button(root, text='Search', command=search_button)
+
+label.grid(row=0, column=0)
+entry.grid(row=0, column=1)
+button.grid(row=1, column=0, columnspan=2)
+
+root.mainloop()

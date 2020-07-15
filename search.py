@@ -14,8 +14,7 @@ def find_matches(path, matches, regex):
                 pass
         if os.path.isfile(p):
             if re.search(regex, x):
-                print(path + x)
-                matches.append(path + x)
+                matches.append(path + '\\' + x)
 
 def system_search(matches, regex):
     """populate matches array with regex filename matches"""
