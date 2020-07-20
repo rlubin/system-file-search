@@ -3,6 +3,7 @@ from tkinter import *
 import re
 import os
 import time
+import subprocess
 
 class App():
     def __init__(self):
@@ -11,7 +12,7 @@ class App():
         self.root.title('System File Search')
         self.root.geometry('500x500')
         self.root.minsize(300, 225)
-        self.root.bind('<Return>', self.hit_enter)
+        self.root.bind('<Return>', self.enter_hit)
 
         self.search_frame = Frame(self.root, height=7)
         self.label = Label(self.search_frame, text='Filename')
@@ -24,6 +25,7 @@ class App():
 
         self.result_frame = Frame(self.root)
         self.listbox = Listbox(self.result_frame, selectmode=EXTENDED)
+        self.listbox.bind('<Double-Button-1>', self.double_click)
         self.count_frame = Frame(self.result_frame)
         self.counter = IntVar()
         self.counter.set(0)
@@ -45,13 +47,13 @@ class App():
 
         self.root.mainloop()
 
-    def find_matches2(self, path, listbox, regex):
+    def find_matches(self, path, listbox, regex):
         """recursive function that crawls through directories and appends filenames to listbox that match the regular expression"""
         for x in os.listdir(path):
             p = os.path.join(path, x)
             if os.path.isdir(p):
                 try:
-                    a = self.find_matches2(p, listbox, regex)
+                    a = self.find_matches(p, listbox, regex)
                     paths.extend(a)
                 except:
                     pass
@@ -62,26 +64,33 @@ class App():
                     update_counter = self.counter.get() + 1
                     self.counter.set(update_counter)
 
-    def system_search2(self, listbox, regex):
+    def system_search(self, listbox, regex):
         """populate listbox with filename matches"""
         root_dir = Path.home().parts[0]
         p = Path('.')
         p = p.resolve()
-        self.find_matches2(root_dir, listbox, regex)
+        self.find_matches(root_dir, listbox, regex)
 
         # for x in range(5):
         #     time.sleep(1)
-        #     listbox.insert(END, x)
-        #     update_counter = counter.get() + 1
-        #     counter.set(update_counter)
+        #     self.listbox.insert(END, x)
+        #     update_counter = self.counter.get() + 1
+        #     self.counter.set(update_counter)
 
     def search_button(self):
         """handle search button click, open new window displaying matches"""
         regex = self.entry.get()
-        self.system_search2(self.listbox, regex)
+        self.system_search(self.listbox, regex)
 
-    def hit_enter(self, event):
+    def enter_hit(self, event):
         """allow the search button to be activated with enter key"""
         self.search_button()
+
+    def double_click(self, event):
+        """opens file explorer to current single selection"""
+        filepath = self.listbox.get(self.listbox.curselection())
+        loc = Path(filepath)
+        folder = os.path.dirname(loc)
+        subprocess.Popen(f'explorer /select, "{loc}"')
 
 app = App()
