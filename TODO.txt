@@ -1,1 +1,4 @@
 use config to update widgets in real time
+    maybe the problem is that i'm using a recursive function?
+
+add the ability to click a file and open it up in the file explorer

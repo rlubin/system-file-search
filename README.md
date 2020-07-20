@@ -5,7 +5,7 @@ System file search is an app that allows you to find files on windows device.
 # Start Program
 
 ```
-py app.py
+py App.py
 ```
 
 # Seach
