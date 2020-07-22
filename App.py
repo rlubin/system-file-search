@@ -2,12 +2,12 @@ from pathlib import Path
 from tkinter import *
 import re
 import os
-import time
 import subprocess
+import time
 
 class App():
     def __init__(self):
-        """setting up the initial window and its contents"""
+        """window setup"""
         self.root = Tk()
         self.root.title('System File Search')
         self.root.geometry('500x500')
@@ -26,14 +26,17 @@ class App():
         self.result_frame = Frame(self.root)
         self.listbox = Listbox(self.result_frame, selectmode=EXTENDED)
         self.listbox.bind('<Double-Button-1>', self.double_click)
-        self.count_frame = Frame(self.result_frame)
+        self.count_frame = Frame(self.result_frame, height=7)
         self.counter = IntVar()
         self.counter.set(0)
+        self.status = StringVar()
         self.matches_label = Label(self.count_frame, text='Matches: ')
         self.count_label = Label(self.count_frame, textvariable=self.counter)
+        self.search_status = Label(self.count_frame, textvariable=self.status)
         self.matches_label.pack(side=LEFT)
         self.count_label.pack(side=LEFT)
-        self.count_frame.pack(side=TOP, anchor=W)
+        self.search_status.pack(side=RIGHT)
+        self.count_frame.pack(fill=X)
         self.y_scrollbar = Scrollbar(self.result_frame)
         self.y_scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox.config(yscrollcommand=self.y_scrollbar.set)
@@ -47,40 +50,31 @@ class App():
 
         self.root.mainloop()
 
-    def find_matches(self, path, listbox, regex):
-        """recursive function that crawls through directories and appends filenames to listbox that match the regular expression"""
+    def find_matches(self, path, regex):
+        """recursive function that crawls through directories and updates filenames to listbox that match the regular expression"""
         for x in os.listdir(path):
             p = os.path.join(path, x)
             if os.path.isdir(p):
                 try:
-                    a = self.find_matches(p, listbox, regex)
+                    a = self.find_matches(p, regex)
                     paths.extend(a)
                 except:
                     pass
             if os.path.isfile(p):
                 if re.search(regex, x):
-                    print(path + '\\' + x)
-                    listbox.insert(END, path + '\\' + x)
+                    self.listbox.insert(END, path + '\\' + x)
                     update_counter = self.counter.get() + 1
                     self.counter.set(update_counter)
-
-    def system_search(self, listbox, regex):
-        """populate listbox with filename matches"""
-        root_dir = Path.home().parts[0]
-        p = Path('.')
-        p = p.resolve()
-        self.find_matches(root_dir, listbox, regex)
-
-        # for x in range(5):
-        #     time.sleep(1)
-        #     self.listbox.insert(END, x)
-        #     update_counter = self.counter.get() + 1
-        #     self.counter.set(update_counter)
+                    self.listbox.update()
+                    self.counter.update()
 
     def search_button(self):
-        """handle search button click, open new window displaying matches"""
+        """handle search button click"""
         regex = self.entry.get()
-        self.system_search(self.listbox, regex)
+        root_dir = Path.home().parts[0]
+        self.status.set('Search in progress...')
+        self.find_matches(root_dir, regex)
+        self.status.set('Search complete')
 
     def enter_hit(self, event):
         """allow the search button to be activated with enter key"""
